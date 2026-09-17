@@ -1,7 +1,7 @@
-i have to make a parking management system for my round 2 builder challenge. The problem is basically a multi level parking garage where cars come and go and the attendant has to check them in and out and charge them correctly.
-The first hour is $10, next hours are $5 and max charge is $40 per day. If someone parks for 1 hour 5 min then it should count as 2 hours.
-There are compact, standard and EV spots and EV cars should only go to EV spots. I also need search by number plate and an option to quickly check if EV spot is available.The parking records can become very large so i need pagination and sorting also.
-I want to make this as a proper full stack application. Please guide me from the start and help me build it step by step.
+i have to make A busy multi-level city-centre parking garage. Cars come and go all day, and the attendant needs to check a car in, check it out, and charge the right fee. Rates are tiered — the first hour is one price, each extra hour is cheaper, and there’s a daily cap so nobody is overcharged for a long stay; part-hours round up. Spots are limited and come in types — compact, standard, and EV (with a charger) — and an EV must get an EV spot. Drivers keep asking ‘is an EV spot free right now?’ and the attendant hunts for a car by its plate. By evening the log is huge.
+Build the attendant something so every car is charged correctly and no spot is double-parked.
+(The attendant’s day is the spec — build it for any garage, not one. Get check-in / check-out and the fee right first, then the spot types and lookups.)
+
 
 
  before starting the coding can you tell me what basic structure we should follow for this application? I want to understand the frontend backend and database part first.
