@@ -60,3 +60,5 @@ before i submit this project, give me a final testing checklist. I want to make 
  now help me prepare the required README.md and REASONING.md files. Keep them simple and explain the actual architecture, logic and decisions used in my application.
 
  everything is working now. I have updated the required files. Tell me what git commands i should use to add, commit and push all the final changes to my repository.
+
+i want to add Readme.md and reasoning .md in which i have to write details of the project and logic so tell me what can i write in that too 
