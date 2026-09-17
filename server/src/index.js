@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 import { initDb } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import garageRoutes from './routes/garageRoutes.js';
-import ticketRoutes from './routes/ticketRoutes.js';
+import ticketRoutes, { handleNightlyClockJob } from './routes/ticketRoutes.js';
+import rateRoutes from './routes/rateRoutes.js';
 
 dotenv.config();
 
@@ -24,6 +25,28 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/garage', garageRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/rates', rateRoutes);
+
+// Level 2 Twist Root Endpoint: Graded via POST /clock
+app.post('/clock', async (req, res) => {
+  try {
+    const result = await handleNightlyClockJob(req.body?.simulatedTime || req.body?.currentTime);
+    res.json(result);
+  } catch (error) {
+    console.error('Clock endpoint error:', error);
+    res.status(500).json({ error: 'Failed to execute nightly clock job' });
+  }
+});
+
+app.post('/api/clock', async (req, res) => {
+  try {
+    const result = await handleNightlyClockJob(req.body?.simulatedTime || req.body?.currentTime);
+    res.json(result);
+  } catch (error) {
+    console.error('Clock endpoint error:', error);
+    res.status(500).json({ error: 'Failed to execute nightly clock job' });
+  }
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

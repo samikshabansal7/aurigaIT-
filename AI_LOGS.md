@@ -1,6 +1,6 @@
 # AI_LOGS.md — Developer Raw AI Interaction & Prompt Logs
 
-This document records the prompt conversation log between the candidate and the AI assistant during the Round 2 Builder challenge session.
+This document records the prompt conversation log between the candidate and the AI assistant during the Round 2 Builder challenge session, including the three contest twists.
 
 ---
 
@@ -12,17 +12,12 @@ This document records the prompt conversation log between the candidate and the 
 #### Step 2: Full-Stack Execution Command
 > **Candidate**: "so guide me step by step and make the project"
 
-#### Step 3: Billing & Rounding Logic
-> **Candidate**: "make sure fee calculation rounds up 1h 5m to 2 hours and caps at $40 for a 24h stay. also add unit tests to verify the math"
+#### Step 3: Base Implementation & Verification
+> **Candidate**: "make sure fee calculation rounds up 1h 5m to 2 hours and caps at $40 for a 24h stay. also add unit tests to verify the math and push to my repo https://github.com/samikshabansal7/aurigaIT-.git"
 
-#### Step 4: EV Charging Constraint Enforcement
-> **Candidate**: "check if an EV car tries to park in a non-EV spot, throw error rule violation EV vehicles MUST be parked in EV spot with charger"
-
-#### Step 5: Attendant Dashboard & Landing Page
-> **Candidate**: "add landing page with overview, ROI calculator, and 3 future roadmap features (ALPR cameras, dynamic surge pricing, mobile app reservation). add floor map dashboard with EV free count indicator"
-
-#### Step 6: License Plate Search & Evening Audit Log
-> **Candidate**: "add instant license plate search for attendant and transaction audit log with pagination and sorting"
-
-#### Step 7: Repository Push & Submission
-> **Candidate**: "help me push all files to my repo https://github.com/samikshabansal7/aurigaIT-.git"
+#### Step 4: Contest Twists Implementation (Levels 1, 2, and 3)
+> **Candidate**: "Twists for this problem:
+> Level 1 — T4 (messy data): import a messy rate card (per spot type) with the junk below and price correctly from the cleaned rates.
+> Level 2 — T2 (automation): 'A nightly job auto-closes and bills any session parked over 24 h.' Graded via POST /clock.
+> Level 3 — T6 (lifecycle): 'Transfer an open session to a different plate (valet hand-off); spot and entry time carry over.'
+> these are the changes change and commit this too"

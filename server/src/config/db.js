@@ -70,6 +70,16 @@ export async function initDb() {
   `);
 
   await run(`
+    CREATE TABLE IF NOT EXISTS spot_rates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      spot_type TEXT UNIQUE NOT NULL CHECK(spot_type IN ('compact', 'standard', 'ev')),
+      hourly_first_rate REAL NOT NULL,
+      hourly_next_rate REAL NOT NULL,
+      daily_cap_rate REAL NOT NULL
+    );
+  `);
+
+  await run(`
     CREATE TABLE IF NOT EXISTS floors (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       garage_id INTEGER NOT NULL,
@@ -115,9 +125,13 @@ export async function initDb() {
        VALUES ('Metropolis City Garage', 10.0, 5.0, 40.0)`
     );
     garageId = res.id;
-    console.log('Seeded Metropolis City Garage');
-  } else {
-    garageId = existingGarage.id;
+  // Seed default cleaned rates per spot type if empty
+  const existingRates = await query(`SELECT * FROM spot_rates`);
+  if (existingRates.length === 0) {
+    await run(`INSERT INTO spot_rates (spot_type, hourly_first_rate, hourly_next_rate, daily_cap_rate) VALUES ('compact', 8.0, 4.0, 35.0)`);
+    await run(`INSERT INTO spot_rates (spot_type, hourly_first_rate, hourly_next_rate, daily_cap_rate) VALUES ('standard', 10.0, 5.0, 40.0)`);
+    await run(`INSERT INTO spot_rates (spot_type, hourly_first_rate, hourly_next_rate, daily_cap_rate) VALUES ('ev', 12.0, 6.0, 45.0)`);
+    console.log('Seeded cleaned spot rates per spot type (Compact, Standard, EV)');
   }
 
   // Seed default demo user (Attendant)

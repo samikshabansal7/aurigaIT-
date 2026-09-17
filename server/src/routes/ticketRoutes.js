@@ -166,6 +166,109 @@ router.post('/:id/check-out', async (req, res) => {
   }
 });
 
+// LEVEL 2 TWIST (T2 Automation - Nightly Clock Job to auto-close sessions >= 24h)
+export async function handleNightlyClockJob(simulatedTimeInput) {
+  const simulatedTime = simulatedTimeInput ? new Date(simulatedTimeInput) : new Date();
+  const simulatedTimeIso = simulatedTime.toISOString();
+
+  const activeTickets = await query(`
+    SELECT t.*, s.spot_type 
+    FROM tickets t
+    JOIN spots s ON t.spot_id = s.id
+    WHERE t.status = 'active'
+  `);
+
+  const rates = await getGarageRates();
+  const autoClosedSessions = [];
+
+  for (const ticket of activeTickets) {
+    const checkInTime = new Date(ticket.check_in_time).getTime();
+    const durationMs = simulatedTime.getTime() - checkInTime;
+    const durationHours = durationMs / (1000 * 3600);
+
+    if (durationHours >= 24) {
+      const calculation = calculateParkingFee(ticket.check_in_time, simulatedTimeIso, rates);
+
+      await run(
+        `UPDATE tickets SET check_out_time = ?, hours_billed = ?, total_fee = ?, status = 'completed' WHERE id = ?`,
+        [simulatedTimeIso, calculation.billedHours, calculation.totalFee, ticket.id]
+      );
+      await run(`UPDATE spots SET is_occupied = 0 WHERE id = ?`, [ticket.spot_id]);
+
+      autoClosedSessions.push({
+        ticketId: ticket.id,
+        licensePlate: ticket.license_plate,
+        hoursBilled: calculation.billedHours,
+        totalFee: calculation.totalFee,
+        autoClosedAt: simulatedTimeIso
+      });
+    }
+  }
+
+  return {
+    message: 'Nightly auto-close job executed',
+    simulatedTime: simulatedTimeIso,
+    autoClosedCount: autoClosedSessions.length,
+    closedSessions: autoClosedSessions
+  };
+}
+
+router.post('/clock', async (req, res) => {
+  try {
+    const result = await handleNightlyClockJob(req.body?.simulatedTime || req.body?.currentTime);
+    res.json(result);
+  } catch (error) {
+    console.error('Clock error:', error);
+    res.status(500).json({ error: 'Failed to execute nightly clock job' });
+  }
+});
+
+// LEVEL 3 TWIST (T6 Lifecycle - Valet Session Transfer)
+router.post('/:id/transfer', async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const { new_license_plate } = req.body;
+
+    if (!new_license_plate || !new_license_plate.trim()) {
+      return res.status(400).json({ error: 'New license plate is required for valet transfer' });
+    }
+
+    const ticket = await getOne(`SELECT * FROM tickets WHERE id = ? AND status = 'active'`, [ticketId]);
+    if (!ticket) {
+      return res.status(404).json({ error: 'Active parking ticket not found for transfer' });
+    }
+
+    const formattedPlate = new_license_plate.trim().toUpperCase();
+
+    const existingActive = await getOne(
+      `SELECT * FROM tickets WHERE license_plate = ? AND status = 'active' AND id != ?`,
+      [formattedPlate, ticketId]
+    );
+    if (existingActive) {
+      return res.status(409).json({ error: `Vehicle ${formattedPlate} is already parked in spot ID ${existingActive.spot_id}` });
+    }
+
+    await run(`UPDATE tickets SET license_plate = ? WHERE id = ?`, [formattedPlate, ticketId]);
+
+    const updatedTicket = await getOne(
+      `SELECT t.*, s.spot_number, s.spot_type, f.name as floor_name 
+       FROM tickets t 
+       JOIN spots s ON t.spot_id = s.id 
+       JOIN floors f ON s.floor_id = f.id 
+       WHERE t.id = ?`,
+      [ticketId]
+    );
+
+    res.json({
+      message: 'Valet session transferred successfully. Spot and entry time preserved.',
+      ticket: updatedTicket
+    });
+  } catch (error) {
+    console.error('Valet transfer error:', error);
+    res.status(500).json({ error: 'Internal server error during session transfer' });
+  }
+});
+
 // 3. SEARCH TICKETS BY LICENSE PLATE (Quick Hunt Lookup)
 router.get('/search', async (req, res) => {
   try {
