@@ -1,0 +1,14 @@
+{
+  "name": "parkpulse-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ParkPulse - Smart Multi-Level Garage Management System Root Workspace",
+  "scripts": {
+    "setup": "cd server && npm install && cd ../client && npm install",
+    "start": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "test": "cd server && npm test",
+    "build": "cd client && npm run build"
+  }
+}
