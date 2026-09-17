@@ -1,7 +1,5 @@
 # ParkPulse – Smart Multi-Level Garage Management System
 
-> **Campus Recruitment Round 2 – Builder Submission**
-
 ParkPulse is a full-stack parking management application made for a multi-level parking garage. It helps the attendant manage vehicle entry and exit, parking spots, parking charges and parking records.
 
 The application also includes the three contest twists: messy rate card import, automatic billing for sessions over 24 hours, and transfer of an active parking session to another vehicle plate.
